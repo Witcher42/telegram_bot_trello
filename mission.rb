@@ -2,7 +2,7 @@
 require 'telegram/bot'
 require 'json'
 require 'uri'
-require './json_save.rb'
+require './trello-json.rb'
 token = 'REPLACE THIS WITH THE BOT TOKEN'
 incompleteLabels = ['5666779e19ad3a5dc26426a5','57287baf9148b133b928f6da','56d4fd5d152c3f92fd3a75c7','574c64565b9b3323fb39a5bd']
 
