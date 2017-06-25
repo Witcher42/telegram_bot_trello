@@ -6,6 +6,8 @@ require_relative 'trello-json'
 token = 'REPLACE THIS WITH THE BOT TOKEN'
 incompleteLabels = ['5666779e19ad3a5dc26426a5','57287baf9148b133b928f6da','56d4fd5d152c3f92fd3a75c7','574c64565b9b3323fb39a5bd']
 
+logger = Logger.new($stderr)
+
 begin
   Telegram::Bot::Client.run(token, logger: Logger.new($stderr)) do |bot|
 		bot.logger.info('Bot has been started')
@@ -18,7 +20,7 @@ begin
 					when /\/q ./
 						s_mission_title = message.text.sub(/\/q / , "").downcase.to_s
 						next if s_mission_title == '[' || s_mission_title == ']'
-						trello = open('ingress-medal-arts.json').read
+						trello = open("#{__dir__}/ingress-medal-arts.json").read
 						if trello.nil?
 							bot.api.send_message(chat_id: message.chat.id, text: "出错辣，快召唤 @Miaonster") 
 							next
@@ -79,20 +81,20 @@ begin
 						bot.api.send_message(chat_id: message.chat.id, text: "查询任务格式为: /q 任务名\n（建议大家如果仅仅是搜索 trello 可以小窗 bot，以免对群组成员造成垃圾信息骚扰）")
 					end
 			rescue => e
+				logger.error("uncaught #{e} exception while handling connection: #{e.message}")
+				logger.error("Stack trace: #{e.backtrace.map {|l| "  #{l}\n"}.join}")
 				bot.api.send_message(chat_id: message.chat.id, text: "出错辣，启动强大自我修复机制，一分钟后如果还自动修不好，先检查 trello 格式是否符合 MarkDown 规范，如果还不行，再召唤 @Miaonster 哟") 
 				uri = URI('https://trello.com/b/LvwOjrYP/ingress-medal-arts.json')
 				save(uri)
-				puts "uncaught #{e} exception while handling connection: #{e.message}"
-				puts "Stack trace: #{e.backtrace.map {|l| "  #{l}\n"}.join}"
 				sleep(70)
 				retry
 			end
 		end
 	end
 rescue => e
-	puts "uncaught #{e} exception while handling connection: #{e.message}"
-	puts "Stack trace: #{e.backtrace.map {|l| "  #{l}\n"}.join}"
-	puts '又出错一次啦，人家先睡 70s 喔'
+	logger.error("uncaught #{e} exception while handling connection: #{e.message}")
+	logger.error("Stack trace: #{e.backtrace.map {|l| "  #{l}\n"}.join}")
+	logger.error('又出错一次啦，人家先睡 70s 喔')
  	sleep(70)
  	retry
 end
