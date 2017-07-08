@@ -57,7 +57,10 @@ begin
 						elsif mission_title.length == 1
 							result << "任务名:#{cards_hash[mission_title[0]]['name']}"
 							result << ((incompleteLabels+cards_hash[mission_title[0]]['idLabels']).uniq! == nil ? "\n" : " (incomplete)\n")
-							result << "任务描述: #{cards_hash[mission_title[0]]['desc']} \n"
+							desc = cards_hash[mission_title[0]]['desc']
+							regexp = /((http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?)/ix
+							desc = desc.gsub(regexp, '[\1](\1)')
+							result << "任务描述: #{desc} \n"
 							result << "trello链接: [点我点我](#{cards_hash[mission_title[0]]['shortUrl']})\n"
 
 							# if cards_hash[mission_title[0]]['name'].sub(/^\[.*\]/ , "")
